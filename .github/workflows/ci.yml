@@ -46,6 +46,18 @@ jobs:
       - name: Run clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
 
+  budget-baselines-sanity:
+    name: budget-baselines placeholder check
+    runs-on: ubuntu-latest
+    # Hard-fails if any entry in budget-baselines.toml has a cpu or memory
+    # value below 100, which strongly indicates it is still a placeholder.
+    # Placeholder values cause assert_budget_within_threshold to trivially
+    # pass against any real measurement, masking actual regressions.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check budget-baselines.toml for placeholder values
+        run: bash scripts/check-budget-baselines.sh budget-baselines.toml
+
   budget-regression:
     name: budget regression checks
     runs-on: ubuntu-latest
